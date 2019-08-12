@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29201.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{844296B5-6325-4201-844A-C12B3B6CB522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfTest", "EfTest\EfTest.csproj", "{1AB51DB2-0E51-424A-AB3A-A1FA2936A6D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{844296B5-6325-4201-844A-C12B3B6CB522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{844296B5-6325-4201-844A-C12B3B6CB522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{844296B5-6325-4201-844A-C12B3B6CB522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{844296B5-6325-4201-844A-C12B3B6CB522}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AB51DB2-0E51-424A-AB3A-A1FA2936A6D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AB51DB2-0E51-424A-AB3A-A1FA2936A6D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AB51DB2-0E51-424A-AB3A-A1FA2936A6D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AB51DB2-0E51-424A-AB3A-A1FA2936A6D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3D765598-2119-4AAE-B205-57ECE23CE843}
+	EndGlobalSection
+EndGlobal
