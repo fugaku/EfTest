@@ -77,6 +77,7 @@ namespace EfTest
                 {
                     var user = await context.Users.Where(x => x.Id == 1).Select(x => new User { Id = x.Id, Name = x.Name }).FirstOrDefaultAsync();
                     user.Name = "name2";
+                    Assert.Empty(context.ChangeTracker.Entries());
                     await context.SaveChangesAsync();
                 }
 
@@ -159,7 +160,9 @@ namespace EfTest
                 using (var context = new SampleDbContext(options))
                 {
                     var user = await context.Users.Where(x => x.Id == 1).Select(x => new User { Id = x.Id }).FirstOrDefaultAsync();
+                    Assert.Empty(context.ChangeTracker.Entries());
                     context.Remove(user);
+                    Assert.Single(context.ChangeTracker.Entries());
                     await context.SaveChangesAsync();
                 }
 
@@ -167,6 +170,70 @@ namespace EfTest
                 {
                     var user = await context.Users.FirstOrDefaultAsync();
                     Assert.Null(user);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task SelectProjection_ShouldNotTrack()
+        {
+            using (var connection = new SqliteConnection("DataSource=:memory:"))
+            {
+                connection.Open();
+
+                var options = new DbContextOptionsBuilder<SampleDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+
+                using (var context = new SampleDbContext(options))
+                {
+                    await context.Database.EnsureCreatedAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = new User() { Name = "name1", Description = "description1" };
+                    context.Users.Add(user);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = await context.Users.Where(x => x.Id == 1).Select(x => new User { Id = x.Id, Name = x.Name, Description = x.Description }).FirstOrDefaultAsync();
+                    Assert.Empty(context.ChangeTracker.Entries());
+                    Assert.NotNull(user);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task SelectNoProjection_ShouldTrack()
+        {
+            using (var connection = new SqliteConnection("DataSource=:memory:"))
+            {
+                connection.Open();
+
+                var options = new DbContextOptionsBuilder<SampleDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+
+                using (var context = new SampleDbContext(options))
+                {
+                    await context.Database.EnsureCreatedAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = new User() { Name = "name1", Description = "description1" };
+                    context.Users.Add(user);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = await context.Users.Where(x => x.Id == 1).FirstOrDefaultAsync();
+                    Assert.Single(context.ChangeTracker.Entries());
+                    Assert.NotNull(user);
                 }
             }
         }
