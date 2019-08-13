@@ -175,6 +175,46 @@ namespace EfTest
         }
 
         [Fact]
+        public async Task Delete_WithoutSelectOrAttach()
+        {
+            using (var connection = new SqliteConnection("DataSource=:memory:"))
+            {
+                connection.Open();
+
+                var options = new DbContextOptionsBuilder<SampleDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+
+                using (var context = new SampleDbContext(options))
+                {
+                    await context.Database.EnsureCreatedAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = new User() { Name = "name1", Description = "description1" };
+                    context.Users.Add(user);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = new User { Id = 1 };
+                    Assert.Empty(context.ChangeTracker.Entries());
+                    context.Remove(user);
+                    Assert.Single(context.ChangeTracker.Entries());
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = await context.Users.FirstOrDefaultAsync();
+                    Assert.Null(user);
+                }
+            }
+        }
+
+        [Fact]
         public async Task SelectProjection_ShouldNotTrack()
         {
             using (var connection = new SqliteConnection("DataSource=:memory:"))
