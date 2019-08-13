@@ -237,5 +237,58 @@ namespace EfTest
                 }
             }
         }
+
+        [Fact]
+        public async Task SelectParentRelationship_ShouldNotBreak()
+        {
+            using (var connection = new SqliteConnection("DataSource=:memory:"))
+            {
+                connection.Open();
+
+                var options = new DbContextOptionsBuilder<SampleDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+
+                using (var context = new SampleDbContext(options))
+                {
+                    await context.Database.EnsureCreatedAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = new User() { Name = "name1", Description = "description1" };
+                    context.Add(user);
+                    var item = new Item() { Name = "item1" };
+                    context.Add(item);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var item = await context.Items.Where(x => x.Id == 1)
+                        .Select(x => new ItemTest
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            UserId = x.UserId,
+                            UserName = x.User.Name
+                        }).FirstOrDefaultAsync();
+                    Assert.Empty(context.ChangeTracker.Entries());
+                    Assert.NotNull(item);
+                    Assert.Equal(1, item.Id);
+                    Assert.Equal("item1", item.Name);
+                    Assert.Equal(0, item.UserId);
+                    Assert.Null(item.UserName);
+                }
+            }
+        }
+    }
+
+    public class ItemTest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int UserId { get; set; }
+        public string UserName { get; set; }
     }
 }
