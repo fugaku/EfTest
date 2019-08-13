@@ -36,8 +36,10 @@ namespace EfTest
                 using (var context = new SampleDbContext(options))
                 {
                     var user = await context.Users.Where(x => x.Id == 1).Select(x => new User { Id = x.Id }).FirstOrDefaultAsync();
+                    Assert.Empty(context.ChangeTracker.Entries());
                     user.Name = "name2";
                     context.Entry(user).Property(x => x.Name).IsModified = true;
+                    Assert.Single(context.ChangeTracker.Entries());
                     await context.SaveChangesAsync();
                 }
 
@@ -76,6 +78,7 @@ namespace EfTest
                 using (var context = new SampleDbContext(options))
                 {
                     var user = await context.Users.Where(x => x.Id == 1).Select(x => new User { Id = x.Id, Name = x.Name }).FirstOrDefaultAsync();
+                    Assert.Empty(context.ChangeTracker.Entries());
                     user.Name = "name2";
                     Assert.Empty(context.ChangeTracker.Entries());
                     await context.SaveChangesAsync();
