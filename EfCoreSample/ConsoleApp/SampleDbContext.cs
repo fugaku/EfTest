@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ConsoleApp
 {
@@ -7,6 +8,9 @@ namespace ConsoleApp
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<Top> Tops { get; set; }
+        public DbSet<Mid> Mids { get; set; }
+        public DbSet<Bottom> Bottoms { get; set; }
 
         public SampleDbContext()
         {
@@ -39,5 +43,34 @@ namespace ConsoleApp
         public User User { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; }
+    }
+
+    [Table("top")]
+    public class Top
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<Mid> Mids { get; set; }
+    }
+
+    [Table("mid")]
+    public class Mid
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int TopId { get; set; }
+        public Top Top { get; set; }
+        public List<Bottom> Bottoms { get; set; }
+    }
+
+    [Table("bottom")]
+    public class Bottom
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int MidId { get; set; }
+        public Mid Mid { get; set; }
+        public int TopId { get; set; }
+        public Top Top { get; set; }
     }
 }
