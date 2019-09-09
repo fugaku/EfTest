@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TrackableEntities.Common.Core;
+using TrackableEntities.EF.Core;
 using Xunit;
 
 namespace EfTest
@@ -89,6 +91,51 @@ namespace EfTest
                 {
                     var user = await context.Users.Where(x => x.Id == 1).FirstOrDefaultAsync();
                     Assert.Equal("name1", user.Name);
+                    Assert.Equal("description1", user.Description);
+                }
+            }
+        }
+        
+        [Fact]
+        public async Task Update_OfflineMode()
+        {
+            using (var connection = new SqliteConnection("DataSource=:memory:"))
+            {
+                connection.Open();
+
+                var options = new DbContextOptionsBuilder<SampleDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+
+                using (var context = new SampleDbContext(options))
+                {
+                    await context.Database.EnsureCreatedAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = new User() { Name = "name1", Description = "description1" };
+                    context.Users.Add(user);
+                    await context.SaveChangesAsync();
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = new User { Id = 1, Name = "name2" };
+                    Assert.Empty(context.ChangeTracker.Entries());
+                    user.TrackingState = TrackingState.Modified;
+                    user.ModifiedProperties = new HashSet<string> { "Name" };
+                    Assert.Empty(context.ChangeTracker.Entries());
+                    context.ApplyChanges(user);
+                    Assert.Single(context.ChangeTracker.Entries());
+                    await context.SaveChangesAsync();
+                    context.AcceptChanges(user);
+                }
+
+                using (var context = new SampleDbContext(options))
+                {
+                    var user = await context.Users.Where(x => x.Id == 1).FirstOrDefaultAsync();
+                    Assert.Equal("name2", user.Name);
                     Assert.Equal("description1", user.Description);
                 }
             }

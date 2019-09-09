@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using TrackableEntities.Common.Core;
 
 namespace ConsoleApp
 {
@@ -29,7 +32,19 @@ namespace ConsoleApp
         }
     }
 
-    public class User
+    public class BaseEntity : ITrackable, IMergeable
+    {
+        [NotMapped]
+        public TrackingState TrackingState { get; set; }
+
+        [NotMapped]
+        public ICollection<string> ModifiedProperties { get; set; }
+
+        [NotMapped]
+        public Guid EntityIdentifier { get; set; }
+    }
+
+    public class User : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -37,7 +52,7 @@ namespace ConsoleApp
         public List<Item> Items { get; set; }
     }
 
-    public class Item
+    public class Item : BaseEntity
     {
         public int Id { get; set; }
         public User User { get; set; }
@@ -46,7 +61,7 @@ namespace ConsoleApp
     }
 
     [Table("top")]
-    public class Top
+    public class Top : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -54,7 +69,7 @@ namespace ConsoleApp
     }
 
     [Table("mid")]
-    public class Mid
+    public class Mid : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -64,7 +79,7 @@ namespace ConsoleApp
     }
 
     [Table("bottom")]
-    public class Bottom
+    public class Bottom : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
